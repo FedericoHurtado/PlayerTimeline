@@ -3,6 +3,12 @@
 // setup API calls
 const express = require('express');
 const app = express();
+app.use(express.json())
+
+// routers
+const inputRouter = require('./routes/league');
+app.use("/league/", inputRouter);
+
 
 // which port to listen on 
 app.listen(3001, () => {
