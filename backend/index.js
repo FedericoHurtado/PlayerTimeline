@@ -6,8 +6,8 @@ const app = express();
 app.use(express.json())
 
 // routers
-const inputRouter = require('./routes/league');
-app.use("/league/", inputRouter);
+const inputRouter = require('./routes/timeline');
+app.use("/timeline/", inputRouter);
 
 
 // which port to listen on 
