@@ -28,6 +28,11 @@ router.post("/league", (req, res) => {
 
 });
 
+router.get("/validate", (req, res) => {
+
+    
+})
+
 
 /****************************************
  * Endpoints to access player info

@@ -9,8 +9,8 @@ app.use(express.json())
 app.use(cors());
 
 // routers
-const inputRouter = require('./routes/timeline');
-app.use("/timeline/", inputRouter);
+const inputRouter = require('./routes/league');
+app.use("/league/", inputRouter);
 
 
 // which port to listen on 
