@@ -21,11 +21,25 @@ function Home() {
      * league is valid, move on to next screen. If the league is not
      * valid, display an error message. 
      */
-    const handleSearchClick = () => {
-      // set the local league id 
-      setLeagueId("1234");
-  
-      // call the backend api POST /league endpoint
+    async function handleSearchClick() {
+      try {
+        // call POST to set league ID value
+        await axios.post("http://localhost:3001/league/league", { id: league_id} );
+
+        // check if league is valid
+        const valid = await axios.get("http://localhost:3001/league/validate");
+
+        // if valid, set leagueValid
+        if (valid.data == true) {
+          setLeagueValid(true);
+        } else {
+          // if not, set error message
+          setErrorMessage("Invalid league ID.")
+        }
+
+      } catch (error) {
+        setErrorMessage("An error occurred while attempting to reach the back end.") // show error for back end API calls
+      }
     }
 
     // if league id is found to be valid, switch to PlayerDetails
