@@ -3,7 +3,10 @@
 // setup API calls
 const express = require('express');
 const app = express();
+const cors = require('cors');
+
 app.use(express.json())
+app.use(cors());
 
 // routers
 const inputRouter = require('./routes/timeline');
