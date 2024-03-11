@@ -1,7 +1,7 @@
 // API ROUTES
 
 const { validateLeague } = require('../APIs/validateLeague')
-const { getId } = require('../SQL/databaseUtils');
+const { getPlayerInfo } = require('../SQL/databaseUtils');
 
 const express = require("express");
 const router = express.Router();
@@ -65,7 +65,16 @@ router.post("/player", async (req, res) => {
     const player_name = post.name;
 
     // map name to player id to see if it exists 
-    const player_id = await getId(player_name);
+    const player_info = await getPlayerInfo(player_name);
+
+    const player = {
+        name: player_name,
+        player_id: player_info.player_id,
+        team: player_info.team,
+        position: player_info.position
+    }
+
+    return res.json(player);
 
     // player not found
     if (player_id == -1) {

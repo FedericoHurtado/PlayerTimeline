@@ -8,7 +8,12 @@ function setLeagueId(id) {
     league_id = id;
 }
 
-let current_player = null;
+let current_player = {
+    name: null,
+    player_id: null,
+    team: null,
+    position: null
+};
 
 function getCurrentPlayer() {
     return current_player;

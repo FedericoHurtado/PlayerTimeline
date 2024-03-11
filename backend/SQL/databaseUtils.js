@@ -20,6 +20,8 @@ async function getAllPlayers() {
         //console.log(result);
         const rows = result[0];
         console.log(rows);
+
+        return rows;
     } catch (error) {
         console.error('Error fetching data:', error.message);
     }
@@ -40,13 +42,15 @@ async function getPlayer(player_id) {
         const result = await pool.query(`SELECT player_name FROM players WHERE player_id = ${player_id}`);
         const name = result[0];
         console.log(name);
+
+        return name;
     } catch (error) {
         console.error('Error fetching data:', error.message);
     }
 
 }
 
-async function getId(player_name) {
+async function getPlayerInfo(player_name) {
 
     if (player_name === null) {
         return -1;
@@ -54,13 +58,21 @@ async function getId(player_name) {
 
     try {
         // Query the database to find the player ID based on the provided name
-        const query = "SELECT player_id FROM players WHERE player_name = ?"; // Assuming 'players' is the name of your table
+        const query = "SELECT player_id, team, position FROM players WHERE player_name = ?"; // Assuming 'players' is the name of your table
         const result = await pool.query(query, [player_name]);
 
         
         if (result[0][0]) {
             // If a player with the given name exists, return the player ID
-            return result[0][0].player_id;
+            const player_id = result[0][0].player_id;
+            const team = result[0][0].team;
+            const position = result[0][0].position;
+
+            return {
+                team: team,
+                player_id: player_id,
+                position: position
+            }
         } else {
             // If no player with the given name exists, return -1
             return -1;
@@ -72,20 +84,20 @@ async function getId(player_name) {
     }
 }
 
-async function addPlayer(player_id, player_name) {
+async function addPlayer(player_id, player_name, team, position) {
 
     try {
         result = await pool.query(`
-        INSERT INTO players (player_id, player_name)
-        VALUES (?, ?)
-        `, [player_id, player_name]);
+        INSERT INTO players (player_id, player_name, team, position)
+        VALUES (?, ?, ?, ?)
+        `, [player_id, player_name, team, position]);
 
         return result;
     } catch (error) {
-        console.error(error.message);
+        console.error("Error here: ", error.message);
     }
 
 }
 
-module.exports = { addPlayer, pool, getAllPlayers, getPlayer, clearDB, getId }
+module.exports = { addPlayer, pool, getAllPlayers, getPlayer, clearDB, getPlayerInfo }
 
