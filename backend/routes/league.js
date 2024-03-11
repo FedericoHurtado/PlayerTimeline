@@ -1,4 +1,7 @@
+// API ROUTES
+
 const { validateLeague } = require('../APIs/validateLeague')
+const { getId } = require('../SQL/databaseUtils');
 
 const express = require("express");
 const router = express.Router();
@@ -54,20 +57,30 @@ router.get("/validate", async (req, res) => {
 /****************************************
  * Endpoints to access player info
  ****************************************/
-router.post("/player", (req, res) => {
+router.post("/player", async (req, res) => {
 
     // ensure 200 status code?
 
     const post = req.body;
     const player_name = post.name;
 
-    leagueInfo.setCurrentPlayer(player_name);
+    // map name to player id to see if it exists 
+    const player_id = await getId(player_name);
 
-    res.json(`Current player: ${leagueInfo.getCurrentPlayer()}`);
+    // player not found
+    if (player_id == -1) {
+        res.json("Player not found.")
+    } else {
+        leagueInfo.setCurrentPlayer(player_name);
+        res.json(player_id);        
+    }
+
 });
 
 router.get("/player", (req, res) => {
-    res.json(leagueInfo.getCurrentPlayer())
+    res.json(leagueInfo.getCurrentPlayer());
 })
+
+
 
 module.exports = router
