@@ -67,6 +67,7 @@ router.post("/player", async (req, res) => {
     // map name to player id to see if it exists 
     const player_info = await getPlayerInfo(player_name);
 
+    // create a player object from response
     const player = {
         name: player_name,
         player_id: player_info.player_id,
@@ -74,18 +75,17 @@ router.post("/player", async (req, res) => {
         position: player_info.position
     }
 
-    return res.json(player);
-
     // player not found
-    if (player_id == -1) {
+    if (player_info.player_id == -1) {
         res.json("Player not found.")
     } else {
         leagueInfo.setCurrentPlayer(player_name);
-        res.json(player_id);        
+        res.json(player);        
     }
 
 });
 
+// return current player
 router.get("/player", (req, res) => {
     res.json(leagueInfo.getCurrentPlayer());
 })
