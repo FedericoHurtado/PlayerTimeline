@@ -11,11 +11,6 @@ const leagueInfo = require("../league_info");
  * Endpoints to enter/access league ID
  ****************************************/
 
-// Endpoint to get league ID
-router.get("/league", (req, res) => {
-  res.json(leagueInfo.getLeagueId());
-});
-
 // endpoint to POST a new league ID
 router.post("/league", (req, res) => {
   // obtain the request body
@@ -37,7 +32,7 @@ router.post("/league", (req, res) => {
 });
 
 // API route for validating the league
-router.get("/validate", async (req, res) => {
+router.get("/validateLeague", async (req, res) => {
   try {
     const league_id = leagueInfo.getLeagueId();
     const isValid = await validateLeague(league_id);
@@ -78,9 +73,22 @@ router.post("/player", async (req, res) => {
   }
 });
 
-// return current player
-router.get("/player", (req, res) => {
-  res.json(leagueInfo.getCurrentPlayer());
+// endpoint to get league teams
+router.post("/getLeagueTeams", async (req, res) => {
+  // step 1: ensure req has the league_id in the request body
+  if (!req.body || !req.body.league_id) {
+    res
+      .status(400)
+      .json("Invalid request, please include a request body with a league id.");
+  }
+
+  const league_id = req.body.league_id;
+
+  // step 2: get the teams from the given league_id
+
+  // const teams = await getTeamData(league);
+
+  res.json("OK");
 });
 
 module.exports = router;
