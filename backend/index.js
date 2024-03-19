@@ -12,9 +12,9 @@ app.use(express.json());
 app.use(cors());
 
 // routers
-const inputRouter = require("./routes/league");
+const inputRouter = require("./routes/APIRoutes");
 const { createDB } = require("./Utils/startup");
-app.use("/league/", inputRouter);
+app.use("/", inputRouter);
 
 createDB();
 
