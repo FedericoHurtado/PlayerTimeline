@@ -8,31 +8,6 @@ const {
 
 const express = require("express");
 const router = express.Router();
-const leagueInfo = require("../league_info");
-
-/****************************************
- * Endpoints to enter/access league ID
- ****************************************/
-
-// endpoint to POST a new league ID
-router.post("/league", (req, res) => {
-  // obtain the request body
-  const post = req.body;
-
-  // make sure the body exists and contains an ID
-  if (!post || !post.id) {
-    return res
-      .status(400)
-      .json({ error: "Missing league ID in request body." });
-  }
-
-  // obtain league ID from request, and update it in league_info
-  const league_id = post["id"];
-  leagueInfo.setLeagueId(league_id);
-
-  // return message indicating the success
-  res.json(`League ID: ${leagueInfo.getLeagueId()}`);
-});
 
 // API route for validating the league
 router.get("/validateLeague", async (req, res) => {
