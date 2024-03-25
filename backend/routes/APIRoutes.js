@@ -1,7 +1,10 @@
 // API ROUTES
 
-const { validateLeague } = require("../SleeperAPI/validateLeague");
 const { getPlayerInfo } = require("../SQL/databaseUtils");
+const {
+  getTeamsFromLeague,
+  validateLeague,
+} = require("../SleeperAPI/LeagueUtils");
 
 const express = require("express");
 const router = express.Router();
@@ -86,9 +89,10 @@ router.post("/getLeagueTeams", async (req, res) => {
 
   // step 2: get the teams from the given league_id
 
-  // const teams = await getTeamData(league);
+  const teams = await getTeamsFromLeague(league_id);
+  console.log(teams);
 
-  res.json("OK");
+  res.json(teams);
 });
 
 module.exports = router;
