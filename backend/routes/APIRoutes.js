@@ -10,12 +10,20 @@ const express = require("express");
 const router = express.Router();
 
 // API route for validating the league
-router.get("/validateLeague", async (req, res) => {
+router.post("/validateLeague", async (req, res) => {
+  // ensure that request body has a league_id
+  if (!req.body || !req.body.league_id) {
+    res.status(400).json({ error: "Missing league_id in POST body." });
+  }
+
+  // store league id
+  const league_id = req.body.league_id;
   try {
-    const league_id = leagueInfo.getLeagueId();
+    // call helper function to see if the league_id provides a good league
     const isValid = await validateLeague(league_id);
 
-    res.json(isValid);
+    // return results as JSON
+    res.status(200).json(isValid);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Service Error" });
@@ -46,7 +54,6 @@ router.post("/player", async (req, res) => {
   if (player_info.player_id == -1) {
     res.json("Player not found.");
   } else {
-    leagueInfo.setCurrentPlayer(player_name);
     res.json(player);
   }
 });
