@@ -14,6 +14,7 @@ router.post("/validateLeague", async (req, res) => {
   // ensure that request body has a league_id
   if (!req.body || !req.body.league_id) {
     res.status(400).json({ error: "Missing league_id in POST body." });
+    return;
   }
 
   // store league id
@@ -24,9 +25,12 @@ router.post("/validateLeague", async (req, res) => {
 
     // return results as JSON
     res.status(200).json(isValid);
+    return;
   } catch (error) {
+    // handle error
     console.error(error);
     res.status(500).json({ error: "Internal Service Error" });
+    return;
   }
 });
 
@@ -34,13 +38,21 @@ router.post("/validateLeague", async (req, res) => {
  * Endpoints to access player info
  ****************************************/
 router.post("/player", async (req, res) => {
-  // ensure 200 status code?
+  // ensure call contains name in the name in the body
+  if (!req.body || !req.body.name) {
+    res.status(400).json({ error: "Missing name in POST body" });
+    return;
+  }
 
-  const post = req.body;
-  const player_name = post.name;
-
-  // map name to player id to see if it exists
+  // save player name and see if it maps to a player ID from the DB.
+  const player_name = req.body.name;
   const player_info = await getPlayerInfo(player_name);
+
+  // if -1 is returned, that means the player was not found
+  if (player_info == -1) {
+    res.status(400).json({ Error: "No player with that name is found" });
+    return;
+  }
 
   // create a player object from response
   const player = {
@@ -50,12 +62,8 @@ router.post("/player", async (req, res) => {
     position: player_info.position,
   };
 
-  // player not found
-  if (player_info.player_id == -1) {
-    res.json("Player not found.");
-  } else {
-    res.json(player);
-  }
+  res.status(200).json({ player_found: player });
+  return;
 });
 
 // endpoint to get league teams
@@ -67,14 +75,19 @@ router.post("/getLeagueTeams", async (req, res) => {
       .json("Invalid request, please include a request body with a league id.");
   }
 
+  // store the league id
   const league_id = req.body.league_id;
 
-  // step 2: get the teams from the given league_id
-
+  // get the teams from that league
   const teams = await getTeamsFromLeague(league_id);
-  console.log(teams);
 
-  res.json(teams);
+  if (teams === null) {
+    res.status(404).json({ error: "Error finding teams in the league." });
+    return;
+  }
+
+  // return 200 status code and data found
+  res.status(200).json(teams);
 });
 
 module.exports = router;
