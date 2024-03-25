@@ -1,6 +1,13 @@
 const axios = require("axios");
 
-// helper function to ensure the data given for each team is valid
+/**
+ * Helper function that takes a team object and ensures that
+ * all the necessary metadata is present.
+ * @param {*} curr_team
+ *    team object returned by the sleeper API
+ * @returns
+ *    true if the object contains all necessary info, false otherwise
+ */
 function validateTeam(curr_team) {
   // these fields cannot be null, 0, or undefined
   if (
@@ -80,6 +87,14 @@ async function getTeamsFromLeague(league_id) {
   return teams;
 }
 
+/**
+ * Function to check that a league_id is valid.
+ *
+ * @param {*} league_id
+ *    league_id being checked
+ * @returns
+ *    true if the sleeperAPI returns values for that league_id
+ */
 async function validateLeague(league_id) {
   // ensure there is a valid league id
   if (league_id === null) {
@@ -87,8 +102,6 @@ async function validateLeague(league_id) {
   }
 
   try {
-    console.log(league_id);
-
     // sleeper API returns a null body if a league id does not give a real league
     const response = await axios.get(
       `https://api.sleeper.app/v1/league/${league_id}`
@@ -97,7 +110,7 @@ async function validateLeague(league_id) {
     return response.data !== null;
   } catch (error) {
     // in case of error, return false and log it
-    console.log("Error");
+    console.log(error);
     return false;
   }
 }
