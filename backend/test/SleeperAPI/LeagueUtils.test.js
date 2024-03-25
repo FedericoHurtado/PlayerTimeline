@@ -4,6 +4,10 @@ const {
   validateLeague,
 } = require("../../SleeperAPI/LeagueUtils");
 
+const axios = require("axios");
+
+jest.mock("axios");
+
 /*****************************
  * validateTeam() tests
  *****************************/
@@ -16,14 +20,38 @@ const {
  *  validateLeague() tests
  ****************************/
 
-test("validateLeague: League ID results in null response body from Sleeper", () => {
-  // need to mock axios get to have a null body
+test("validateLeague: League ID results in null response body from Sleeper", async () => {
+  // mock axios to return a null response from a bad sleeper ID
+  const mock_axios_resp = null;
+
+  // mock the GET call to return null
+  axios.get.mockResolvedValue(mock_axios_resp);
+
+  // expect validateLeague to return false
+  expect(await validateLeague(1234)).toBe(false);
 });
 
-test("validateLeague: Empty league id", () => {
-  // need to mock response to null body
-});
+test("validateLeague: Good id, with good response from sleeper", async () => {
+  // response taken from SleeperAPI website for good request
+  mock_axios_resp = {
+    total_rosters: 12,
+    status: "in_season",
+    sport: "nfl",
+    settings: {},
+    season_type: "regular",
+    season: "2018",
+    scoring_settings: {},
+    roster_positions: [],
+    previous_league_id: "198946952535085056",
+    name: "Sleeperbot Dynasty",
+    league_id: "289646328504385536",
+    draft_id: "289646328508579840",
+    avatar: "efaefa889ae24046a53265a3c71b8b64",
+  };
 
-test("validateLeague: Good id, with good response from sleeper", () => {
-  // call sleeper API on postman to see a good response.data and use it here
+  // mock the GET call to return mock_axios_resp
+  axios.get.mockResolvedValue(mock_axios_resp);
+
+  // expect validateLeague to return true if axios returns mock_axios_resp
+  expect(await validateLeague(1234)).toBe(true);
 });
