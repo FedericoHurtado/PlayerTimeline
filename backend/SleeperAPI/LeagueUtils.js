@@ -26,8 +26,14 @@ function validateTeam(curr_team) {
   return true;
 }
 
-// function to retieve all the teams from a league id
-// it will return a list of team objects defined in DataTypes.js
+/**
+ * Function to get a list of all the teams and their metadata
+ * from a given league_id
+ * @param {*} league_id
+ *    id of the league that user wants teams from
+ * @returns
+ *    list of teams and their metadata, null if data is not found for 1 or more teams.
+ */
 async function getTeamsFromLeague(league_id) {
   // list of teams
   let teams = [];
@@ -39,16 +45,18 @@ async function getTeamsFromLeague(league_id) {
 
     // ensure response was given
     if (!response.data) {
-      return []; // possibly throw error?
+      console.log("No data found for any teams in league.");
+      return null;
     }
 
     for (const team_data in response.data) {
-      // if any team is missing data, return invalid
+      // if any team is missing data, return null
       if (!validateTeam(response.data[team_data])) {
-        console.log("No team data");
-        return []; // throw error?
+        console.log("Missing data for one or more teams.");
+        return null;
       }
 
+      // store the metadata for the current team in an object
       const curr_team = {
         players: response.data[team_data].players,
         roster_id: response.data[team_data].roster_id,
@@ -58,13 +66,17 @@ async function getTeamsFromLeague(league_id) {
         ties: response.data[team_data].settings.ties,
         owner_id: response.data[team_data].owner_id,
       };
+
+      // add object into teams
       teams.push(curr_team);
     }
   } catch (error) {
     // handle error
     console.log(error);
+    return null;
   }
 
+  // return list of team objects
   return teams;
 }
 
