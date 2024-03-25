@@ -1,5 +1,4 @@
 const axios = require("axios");
-const { team } = require("../Utils/DataTypes.js");
 
 // helper function to ensure the data given for each team is valid
 function validateTeam(curr_team) {
