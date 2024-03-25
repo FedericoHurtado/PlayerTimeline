@@ -96,11 +96,6 @@ async function getTeamsFromLeague(league_id) {
  *    true if the sleeperAPI returns values for that league_id
  */
 async function validateLeague(league_id) {
-  // ensure there is a valid league id
-  if (league_id === null) {
-    return false;
-  }
-
   try {
     // sleeper API returns a null body if a league id does not give a real league
     const response = await axios.get(
