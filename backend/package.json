@@ -4,7 +4,7 @@
   "description": "back end for player timeline.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "devStart": "nodemon index.js",
     "start": "node index.js"
   },
@@ -20,5 +20,8 @@
     "nodemon": "^3.1.0",
     "sequelize": "^6.37.1",
     "sequelize-cli": "^6.6.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
