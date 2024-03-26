@@ -2,26 +2,11 @@ import React, { useState, useEffect } from "react";
 import { getLeagueTeams } from "../API-Adaptors/getTeamsAdaptor";
 import { sortTeams } from "../Utils/SortTeams";
 
-function LeagueStandings({ leagueId }) {
-  // initialize standings to an empty list initially
-  const [standings, setStandings] = useState([]);
+function LeagueStandings({ teams }) {
+  // sort the teams by win %
+  const standings = sortTeams(teams);
 
-  // once the page mounts, set the standings.
-  useEffect(() => {
-    // get the teams from the league
-    const fetchTeams = async () => {
-      // get the list of teams from the adaptor
-      const teams = await getLeagueTeams(leagueId); // if error getting teams, getLeagueTeams returns [] so no standings will be shown
-
-      const sorted_teams = sortTeams(teams.data); // if error sorting teams, sortTeams returns [] so no standings will be shown
-
-      // set standings to list of sorted teams
-      setStandings(sorted_teams);
-    };
-
-    fetchTeams();
-  }, []);
-
+  // return the list of teams in descending order
   return (
     <div>
       <h1>Current Season Standings</h1>
