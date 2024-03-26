@@ -4,9 +4,11 @@ const { getPlayerInfo } = require("../SQL/databaseUtils");
 const {
   getTeamsFromLeague,
   validateLeague,
+  getOwnerInfo,
 } = require("../SleeperAPI/LeagueUtils");
 
 const express = require("express");
+const { getAllTeamData } = require("../Utils/getAllTeamData");
 const router = express.Router();
 
 // API route for validating the league
@@ -78,16 +80,26 @@ router.post("/getLeagueTeams", async (req, res) => {
   // store the league id
   const league_id = req.body.league_id;
 
-  // get the teams from that league
-  const teams = await getTeamsFromLeague(league_id);
+  try {
+    // get the teams from that league
+    const teams = await getTeamsFromLeague(league_id);
 
-  if (teams === null) {
-    res.status(404).json({ error: "Error finding teams in the league." });
-    return;
+    if (teams === null) {
+      res.status(404).json({ error: "Error finding teams in the league." });
+      return;
+    }
+
+    // get the user data from the league
+    const owners = await getOwnerInfo(league_id);
+
+    // add owner data to teams
+    const full_team_data = getAllTeamData(teams, owners);
+
+    // return 200 status code and data found
+    res.status(200).json(full_team_data);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-
-  // return 200 status code and data found
-  res.status(200).json(teams);
 });
 
 module.exports = router;

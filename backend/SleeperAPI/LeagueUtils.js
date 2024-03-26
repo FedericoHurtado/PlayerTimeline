@@ -63,8 +63,6 @@ async function getTeamsFromLeague(league_id) {
         return null;
       }
 
-      // TODO: FIND OWNER NAME IN HERE + TEAM NAME?
-
       // store the metadata for the current team in an object
       const curr_team = {
         players: response.data[team_data].players,
