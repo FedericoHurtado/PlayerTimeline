@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Login from "./pages/Login";
-import PlayerDetails from "./pages/PlayerDetails";
+import LeagueOverview from "./pages/LeagueOverview";
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
         <Link to="/"> Home </Link>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/PlayerDetails" element={<PlayerDetails />} />
+          <Route path="/leagueOverview/:leagueId" Component={LeagueOverview} />
         </Routes>
       </Router>
     </div>

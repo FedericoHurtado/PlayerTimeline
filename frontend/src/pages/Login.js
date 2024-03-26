@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import PlayerDetails from "./PlayerDetails";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const VALIDATE_ENDPOINT = "http://localhost:3001/validateLeague";
@@ -10,16 +9,10 @@ const VALIDATE_ENDPOINT = "http://localhost:3001/validateLeague";
 function Login() {
   // set 3 local values -> LeagueID, leagueValid, and errorMesage
   const [league_id, setLeagueId] = useState(""); // initially create empty string as id
-  const [leagueValid, setLeagueValid] = useState(false); // initially make league invalid
   const [errorMesage, setErrorMessage] = useState(""); // empty error message
 
   // used to switch pages
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Reset leagueValid to false when the component renders
-    setLeagueValid(false);
-  }, []);
 
   // when the text in the textbox changes, update the league id and reset error
   const handleTextChange = (event) => {
@@ -29,29 +22,27 @@ function Login() {
 
   // on click: update the league ID, and if it is valid move to details page
   async function handleSearchClick() {
-    try {
-      // check if league is valid
-      const valid = await axios.get("http://localhost:3001/league/validate");
+    // step 1: check that a league id was given
+    if (!league_id) {
+      setErrorMessage("Please enter a league ID.");
+      return;
+    }
 
-      // if valid, set leagueValid
-      if (valid.data === true) {
-        setLeagueValid(true);
-        navigate("/PlayerDetails");
+    // step 2: make axios post request
+    try {
+      const response = await axios.post(VALIDATE_ENDPOINT, { league_id });
+
+      // if the API responds with true, naviage to league overview of the given id
+      if (response.data === true) {
+        navigate(`/leagueOverview/${league_id}`);
       } else {
-        // if not, set error message
-        setErrorMessage("Invalid league ID.");
+        // bad league id -> set the error message
+        setErrorMessage("Invalid League ID. Please try again.");
       }
     } catch (error) {
-      setErrorMessage(
-        "An error occurred while attempting to reach the back end."
-      ); // show error for back end API calls
+      console.log(error);
+      setErrorMessage("Error reaching the backend.");
     }
-  }
-
-  // if league id is found to be valid, switch to PlayerDetails
-  if (leagueValid) {
-    //setLeagueValid(false); // reset home page
-    return <PlayerDetails league_id={league_id} />;
   }
 
   // if league is not valid, return the searchbox
@@ -65,7 +56,7 @@ function Login() {
         onChange={handleTextChange}
         placeholder="Enter League ID"
       />
-      <button onClick={handleSearchClick}>Search</button>
+      <button onClick={handleSearchClick}>View League</button>
       {errorMesage && <p className="error">{errorMesage}</p>}{" "}
       {/* Render error message if there's an error */}
     </div>
