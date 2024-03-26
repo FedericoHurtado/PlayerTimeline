@@ -110,4 +110,4 @@ async function validateLeague(league_id) {
   }
 }
 
-module.exports = { getTeamsFromLeague, validateLeague };
+module.exports = { getTeamsFromLeague, validateLeague, validateTeam };

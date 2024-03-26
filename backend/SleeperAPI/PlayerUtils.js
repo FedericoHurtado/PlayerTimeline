@@ -29,11 +29,17 @@ async function getPlayersFromSleeper() {
         position = "N/A";
       }
 
+      // every player must have a player id
+      let p_id = player.player_id;
+      if (p_id === null) {
+        return null;
+      }
+
       const new_player = {
-        name,
-        player_id,
-        position,
-        team,
+        name: name,
+        player_id: p_id,
+        position: position,
+        team: team,
       };
 
       players.push(new_player);
