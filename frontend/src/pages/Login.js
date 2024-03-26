@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import PlayerDetails from "./PlayerDetails";
 import { useNavigate } from "react-router-dom";
 
-// Home page: where user will enter their league ID
-function Home() {
+const VALIDATE_ENDPOINT = "http://localhost:3001/validateLeague";
+
+// Login page: where user will enter their league ID
+function Login() {
   // set 3 local values -> LeagueID, leagueValid, and errorMesage
   const [league_id, setLeagueId] = useState(""); // initially create empty string as id
   const [leagueValid, setLeagueValid] = useState(false); // initially make league invalid
   const [errorMesage, setErrorMessage] = useState(""); // empty error message
 
+  // used to switch pages
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +21,7 @@ function Home() {
     setLeagueValid(false);
   }, []);
 
-  // when text changes, update the league id and reset error
+  // when the text in the textbox changes, update the league id and reset error
   const handleTextChange = (event) => {
     setLeagueId(event.target.value);
     setErrorMessage("");
@@ -27,11 +30,6 @@ function Home() {
   // on click: update the league ID, and if it is valid move to details page
   async function handleSearchClick() {
     try {
-      // call POST to set league ID value
-      await axios.post("http://localhost:3001/league/league", {
-        id: league_id,
-      });
-
       // check if league is valid
       const valid = await axios.get("http://localhost:3001/league/validate");
 
@@ -74,4 +72,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Login;
