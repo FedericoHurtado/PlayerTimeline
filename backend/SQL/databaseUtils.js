@@ -38,17 +38,29 @@ async function clearDB() {
 }
 
 async function getPlayer(player_id) {
-  try {
-    const result = await pool.query(
-      `SELECT player_name FROM players WHERE player_id = ${player_id}`
-    );
-    const name = result[0];
-    console.log(name);
+  if (player_id === null) {
+    return -1;
+  }
 
-    return name;
+  try {
+    const query =
+      "SELECT player_name, team, position FROM players WHERE player_id = ?";
+    const result = await pool.query(query, [player_id]);
+
+    if (result[0][0]) {
+      // If a player with the given ID exists, construct and return an object with their details
+      return {
+        player_name: result[0][0].player_name,
+        team: result[0][0].team,
+        position: result[0][0].position,
+      };
+    } else {
+      // If no player with the given ID exists, return -1
+      return -1;
+    }
   } catch (error) {
     console.error("Error fetching data:", error.message);
-    return null;
+    return -1;
   }
 }
 
@@ -70,7 +82,7 @@ async function getPlayerInfo(player_name) {
   try {
     // Query the database to find the player ID based on the provided name
     const query =
-      "SELECT player_id, team, position FROM players WHERE player_name = ?"; // Assuming 'players' is the name of your table
+      "SELECT player_id, team, position FROM players WHERE player_name = ?";
     const result = await pool.query(query, [player_name]);
 
     if (result[0][0]) {

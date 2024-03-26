@@ -1,6 +1,6 @@
 // API ROUTES
 
-const { getPlayerInfo } = require("../SQL/databaseUtils");
+const { getPlayerInfo, getPlayer } = require("../SQL/databaseUtils");
 const {
   getTeamsFromLeague,
   validateLeague,
@@ -40,26 +40,26 @@ router.post("/validateLeague", async (req, res) => {
  * Endpoints to access player info
  ****************************************/
 router.post("/player", async (req, res) => {
-  // ensure call contains name in the name in the body
-  if (!req.body || !req.body.name) {
-    res.status(400).json({ error: "Missing name in POST body" });
+  // ensure call contains player id in the body
+  if (!req.body || !req.body.player_id) {
+    res.status(400).json({ error: "Missing player_id in POST body" });
     return;
   }
 
   // save player name and see if it maps to a player ID from the DB.
-  const player_name = req.body.name;
-  const player_info = await getPlayerInfo(player_name);
+  const player_id = req.body.player_id;
+  const player_info = await getPlayer(player_id);
 
   // if -1 is returned, that means the player was not found
   if (player_info == -1) {
-    res.status(404).json({ Error: "No player with that name is found" });
+    res.status(404).json({ Error: "No player with that id is found" });
     return;
   }
 
   // create a player object from response
   const player = {
-    name: player_name,
-    player_id: player_info.player_id,
+    name: player_info.player_name,
+    player_id: player_id,
     team: player_info.team,
     position: player_info.position,
   };
