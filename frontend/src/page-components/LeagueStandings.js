@@ -24,12 +24,12 @@ function LeagueStandings({ leagueId }) {
 
   return (
     <div>
-      <h1>Team Standings</h1>
+      <h1>Current Season Standings</h1>
       <ul>
         {standings.map((team, index) => (
           <li key={index}>
-            {team.owner_id} - Wins: {team.wins}, Losses: {team.losses}, Ties:{" "}
-            {team.ties}
+            {team.owner_info.display_name} ({team.owner_info.metadata.team_name}
+            ) - Wins: {team.wins}, Losses: {team.losses}, Ties: {team.ties}
           </li>
         ))}
       </ul>
