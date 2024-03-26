@@ -24,7 +24,7 @@ router.post("/validateLeague", async (req, res) => {
     const isValid = await validateLeague(league_id);
 
     // return results as JSON
-    res.status(200).json(isValid);
+    res.status(200).json({ isValid });
     return;
   } catch (error) {
     // handle error
@@ -50,7 +50,7 @@ router.post("/player", async (req, res) => {
 
   // if -1 is returned, that means the player was not found
   if (player_info == -1) {
-    res.status(400).json({ Error: "No player with that name is found" });
+    res.status(404).json({ Error: "No player with that name is found" });
     return;
   }
 
