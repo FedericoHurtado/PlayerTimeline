@@ -2,8 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const VALIDATE_ENDPOINT = "http://localhost:3001/validateLeague";
+import { validateLeague } from "../API-Adaptors/validateLeagueAdaptor";
 
 // Login page: where user will enter their league ID
 function Login() {
@@ -28,20 +27,15 @@ function Login() {
       return;
     }
 
-    // step 2: make axios post request
-    try {
-      const response = await axios.post(VALIDATE_ENDPOINT, { league_id });
+    // step 2: call the validateLeague adaptor method to see if the league is valid
+    const league_valid = await validateLeague(league_id);
 
-      // if the API responds with true, naviage to league overview of the given id
-      if (response.data === true) {
-        navigate(`/leagueOverview/${league_id}`);
-      } else {
-        // bad league id -> set the error message
-        setErrorMessage("Invalid League ID. Please try again.");
-      }
-    } catch (error) {
-      console.log(error);
-      setErrorMessage("Error reaching the backend.");
+    console.log(`league_valid = ${league_valid}`);
+
+    if (league_valid === true) {
+      navigate(`/leagueOverview/${league_id}`);
+    } else {
+      setErrorMessage("Invalid League ID. Please try again.");
     }
   }
 
