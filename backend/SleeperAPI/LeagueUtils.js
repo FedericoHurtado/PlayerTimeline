@@ -63,6 +63,8 @@ async function getTeamsFromLeague(league_id) {
         return null;
       }
 
+      // TODO: FIND OWNER NAME IN HERE + TEAM NAME?
+
       // store the metadata for the current team in an object
       const curr_team = {
         players: response.data[team_data].players,
@@ -110,4 +112,29 @@ async function validateLeague(league_id) {
   }
 }
 
-module.exports = { getTeamsFromLeague, validateLeague, validateTeam };
+/**
+ * Function that will return a list of users in the league and their associated metadata
+ */
+async function getOwnerInfo(league_id) {
+  try {
+    const response = await axios.get(
+      `https://api.sleeper.app/v1/league/${league_id}/users`
+    );
+
+    // sleeper responds with empty list if no owners are found
+    if (response.data.length === 0) {
+      throw new Error("No data found for the league id given.");
+    }
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = {
+  getTeamsFromLeague,
+  validateLeague,
+  validateTeam,
+  getOwnerInfo,
+};

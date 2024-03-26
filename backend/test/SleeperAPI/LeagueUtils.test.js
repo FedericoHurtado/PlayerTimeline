@@ -2,6 +2,7 @@ const {
   validateTeam,
   getTeamsFromLeague,
   validateLeague,
+  getOwnerInfo,
 } = require("../../SleeperAPI/LeagueUtils");
 
 const axios = require("axios");
@@ -226,7 +227,7 @@ test("validateLeague: League ID results in null response body from Sleeper", asy
   const mock_axios_resp = null;
 
   // mock the GET call to return null
-  axios.get.mockResolvedValue(mock_axios_resp);
+  axios.get.mockResolvedValue({ data: mock_axios_resp });
 
   // expect validateLeague to return false
   expect(await validateLeague(1234)).toBe(false);
@@ -251,8 +252,55 @@ test("validateLeague: Good id, with good response from sleeper", async () => {
   };
 
   // mock the GET call to return mock_axios_resp
-  axios.get.mockResolvedValue(mock_axios_resp);
+  axios.get.mockResolvedValue({ data: mock_axios_resp });
 
   // expect validateLeague to return true if axios returns mock_axios_resp
   expect(await validateLeague(1234)).toBe(true);
+});
+
+/************************
+ * Tests for getOwnerInfo
+//  *************************/
+test("getOwnerInfo: bad id, empty response from sleeper.", async () => {
+  axios.get.mockResolvedValue({ data: [] });
+
+  await expect(getOwnerInfo("123")).rejects.toThrow(
+    "No data found for the league id given."
+  );
+});
+
+test("getOwnerInfo: good id, 2 owners returned by sleeper", async () => {
+  // taken from sleeper API website
+  const user_1 = {
+    user_id: "<user_id>",
+    username: "<username>",
+    display_name: "<display_name>",
+    avatar: "1233456789",
+    metadata: {
+      team_name: "Dezpacito",
+    },
+    is_owner: true, // is commissioner (there can be multiple commissioners)
+  };
+
+  // taken from sleeper API website
+  const user_2 = {
+    user_id: "<user_id_2>",
+    username: "<username_2>",
+    display_name: "<display_name_2>",
+    avatar: "1233456789",
+    metadata: {
+      team_name: "Dezpacito",
+    },
+    is_owner: false, // is commissioner (there can be multiple commissioners)
+  };
+
+  axios.get.mockResolvedValue({ data: [user_1, user_2] });
+
+  expect(await getOwnerInfo(123)).toEqual([user_1, user_2]);
+});
+
+test("getOwnerInfo: error thrown by sleeper API", async () => {
+  axios.get.mockRejectedValue(new Error("Error thrown by axios"));
+
+  await expect(getOwnerInfo(123)).rejects.toThrow("Error thrown by axios");
 });
