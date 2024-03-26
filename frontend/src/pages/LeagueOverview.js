@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import LeagueStandings from "../page-components/LeagueStandings";
+import LeagueStandings from "../page-components/LeagueOverview/LeagueStandings";
 import { getLeagueTeams } from "../API-Adaptors/getTeamsAdaptor";
 
 function LeagueOverview() {

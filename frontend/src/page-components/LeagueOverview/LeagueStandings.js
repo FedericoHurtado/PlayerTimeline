@@ -1,5 +1,5 @@
 import React from "react";
-import { sortTeams } from "../Utils/SortTeams";
+import { sortTeams } from "../../Utils/SortTeams";
 import { useNavigate } from "react-router-dom";
 
 function LeagueStandings({ teams }) {

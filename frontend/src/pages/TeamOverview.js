@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import TeamInfo from "../page-components/TeamOverview/TeamInfo";
 
 const TeamOverview = () => {
   const location = useLocation();
@@ -7,7 +8,9 @@ const TeamOverview = () => {
 
   return (
     <div>
-      <h1> {team.owner_info.display_name} </h1>
+      <div className="team_info">
+        <TeamInfo team={team} />
+      </div>
     </div>
   );
 };
