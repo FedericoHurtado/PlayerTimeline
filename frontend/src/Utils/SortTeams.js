@@ -2,57 +2,48 @@
  * Helper function to sort a list of teams according to their standings.
  */
 
-function validateTeam(team) {
-  // Check if team is an object
-  if (typeof team !== "object" || team === null) {
-    console.log("Team is not an object");
+function validateTeam(curr_team) {
+  console.log(curr_team);
+  // these fields must be present
+  if (
+    !curr_team.roster_id ||
+    !curr_team.players ||
+    !curr_team.owner_id ||
+    !curr_team.wins === undefined || // can be 0
+    !curr_team.losses === undefined ||
+    !curr_team.points_for === undefined ||
+    !curr_team.ties === undefined
+  ) {
     return false;
   }
 
-  // Check if 'players' is an array of integers
-  if (!Array.isArray(team.players) || !team.players.every(Number.isInteger)) {
-    console.log("Team.players must be an array of integers");
-    return false;
-  }
-
-  // Define the integer properties to check
-  const integerProperties = [
-    "roster_id",
-    "points_for",
-    "wins",
-    "ties",
-    "owner_id",
-    "losses",
-  ];
-
-  // Check each integer property
-  for (const prop of integerProperties) {
-    if (!Number.isInteger(team[prop])) {
-      console.log(`Team.${prop} must be an integer`);
-      return false;
-    }
-  }
-
-  // If all checks pass, the team is valid
+  // all required info is present, return that the team is valid
   return true;
 }
-
 function sortTeams(teams) {
   // step 1: ensure input has correct format
-  for (team in teams) {
+  teams.forEach((team) => {
     if (!validateTeam(team)) {
       console.log("Invalid team found, cannot sort teams");
       return [];
     }
-  }
+  });
   // step 2: Calculate winning percentage and add it to the team object
   teams.forEach((team) => {
     const totalGames = team.wins + (team.losses || 0) + team.ties;
     team.winningPercentage = totalGames > 0 ? team.wins / totalGames : 0;
   });
 
-  // step 3: Sort teams by winning percentage in descending order
-  teams.sort((a, b) => b.winningPercentage - a.winningPercentage);
+  // Step 3: Sort teams by winning percentage in descending order, using "points for" as a tiebreaker
+  teams.sort((a, b) => {
+    // First, compare by winning percentage
+    if (b.winningPercentage !== a.winningPercentage) {
+      return b.winningPercentage - a.winningPercentage;
+    }
+
+    // If winning percentages are equal, use "points for" as the tiebreaker
+    return b.points_for - a.points_for;
+  });
 
   // step 4: return sorted teams in a list
   return teams;
