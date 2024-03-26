@@ -8,7 +8,7 @@ async function getLeagueTeams(league_id) {
     const response = await axios.post(GET_TEAMS_ENDPOINT, { league_id });
 
     if (response.status != 200) {
-      throw new Error("Error getting teams.");
+      throw new Error(response.data);
     }
 
     return response;

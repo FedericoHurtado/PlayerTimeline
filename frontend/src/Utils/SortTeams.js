@@ -3,7 +3,6 @@
  */
 
 function validateTeam(curr_team) {
-  console.log(curr_team);
   // these fields must be present
   if (
     !curr_team.roster_id ||
