@@ -16,6 +16,7 @@ function getAllTeamData(roster_data, user_data) {
     roster.owner_info = owner;
   });
 
+  // return roster data with owner data in it
   return roster_data;
 }
 
