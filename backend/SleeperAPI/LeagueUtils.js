@@ -1,4 +1,7 @@
 const axios = require("axios");
+const {
+  getSleeperLeague,
+} = require("../API_Adaptors/SleeperAPI/LeagueAdaptor");
 
 /**
  * Helper function that takes a team object and ensures that
@@ -87,14 +90,14 @@ async function getTeamsFromLeague(league_id) {
   return teams;
 }
 
-/**
- * Function to check that a league_id is valid.
- *
- * @param {*} league_id
- *    league_id being checked
- * @returns
- *    true if the sleeperAPI returns values for that league_id
- */
+// /**
+//  * Function to check that a league_id is valid.
+//  *
+//  * @param {*} league_id
+//  *    league_id being checked
+//  * @returns
+//  *    true if the sleeperAPI returns values for that league_id
+//  */
 async function validateLeague(league_id) {
   try {
     // sleeper API returns a null body if a league id does not give a real league
@@ -131,28 +134,14 @@ async function getOwnerInfo(league_id) {
 }
 
 /**
- * Function to call the sleeper API and get important data
- * about a given league.
- * @param {*} league_id
- * @returns
+ * TODO: write comment
  */
 async function getLeagueInfo(league_id) {
-  // call sleeper API league endpoint
   try {
-    // get the league info
-    const response = await axios.get(
-      `https://api.sleeper.app/v1/league/${league_id}`
-    );
+    // call the API adaptor to return a sleeper league
+    const league = await getSleeperLeague(league_id);
 
-    // ensure that a valid league was returned
-    if (!response.data) {
-      throw new Error("Data not found for the given league ID.");
-    }
-
-    // extract wanted values from sleeper body
-    const league = response.data;
-
-    // ensure the league has all neededvalues
+    // ensure the league has all needed values
     if (
       !league.hasOwnProperty("total_rosters") ||
       !league.hasOwnProperty("season") ||
@@ -164,25 +153,17 @@ async function getLeagueInfo(league_id) {
     }
 
     // create and return league object from obtained info
-    const num_teams = league.total_rosters;
-    const season = league.season;
-    const league_name = league.name;
-    const status = league.status;
-    const playoff_bracket = league.bracket_id;
-
     const league_info = {
-      num_teams: num_teams,
-      season: season,
-      league_name: league_name,
-      status: status,
-      playoff_bracket: playoff_bracket,
+      num_teams: league.total_rosters,
+      season: league.season,
+      league_name: league.name,
+      status: league.status,
+      playoff_bracket: league.bracket_id,
     };
 
     return league_info;
-
-    // ensure
   } catch (error) {
-    // axios throws error on every non-200 status code
+    // adaptor will throw error if there is a bad request
     throw error;
   }
 }
@@ -201,24 +182,23 @@ async function allLeagues(league_id) {
     try {
       // step 2: add current league to list of leagues
       leagues.push(curr_id);
-      // step 3: make sleeper API call to find previous league
-      const response = await axios.get(
-        `https://api.sleeper.app/v1/league/${curr_id}`
-      );
 
-      // step 4: ensure response contains data and a previous league
-      if (
-        !response.data ||
-        !response.data.hasOwnProperty("previous_league_id")
-      ) {
+      // step 3: call the api adaptor to get the info for the current league
+      const league = await getSleeperLeague(curr_id);
+
+      console.log(league);
+
+      // step 4: ensure the league contains information about the previous league
+      if (!league.hasOwnProperty("previous_league_id")) {
         throw new Error(
           "Unable to find any information about previous leagues."
         );
       }
 
-      // step 5: set league_id to that of the previous league and continue
-      curr_id = response.data.previous_league_id;
+      // step 5: update curr_id to be the oldest league found
+      curr_id = league.previous_league_id;
     } catch (error) {
+      // adaptor will throw error if there is a bad request
       throw error;
     }
   }
