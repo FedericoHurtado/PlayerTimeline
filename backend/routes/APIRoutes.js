@@ -5,6 +5,8 @@ const {
   getTeamsFromLeague,
   validateLeague,
   getOwnerInfo,
+  getLeagueInfo,
+  allLeagues,
 } = require("../SleeperAPI/LeagueUtils");
 
 const express = require("express");
@@ -102,4 +104,27 @@ router.post("/getLeagueTeams", async (req, res) => {
   }
 });
 
+router.post("/leagueInfo", async (req, res) => {
+  // step 1: ensure req has the league_id in the request body
+  if (!req.body || !req.body.league_id) {
+    res.status(400).json({
+      error: "Invalid request, please include a request body with a league id.",
+    });
+  }
+
+  const league_id = req.body.league_id;
+
+  // step 2: make a call to getLeagueInfo and allLeagues
+  try {
+    const league_info = await getLeagueInfo(league_id);
+
+    const all_leagues = await allLeagues(league_id);
+
+    league_info.previous_leagues = all_leagues;
+
+    res.status(200).json(league_info);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+});
 module.exports = router;
