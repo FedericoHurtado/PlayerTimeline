@@ -186,8 +186,6 @@ async function allLeagues(league_id) {
       // step 3: call the api adaptor to get the info for the current league
       const league = await getSleeperLeague(curr_id);
 
-      console.log(league);
-
       // step 4: ensure the league contains information about the previous league
       if (!league.hasOwnProperty("previous_league_id")) {
         throw new Error(
@@ -199,7 +197,7 @@ async function allLeagues(league_id) {
       curr_id = league.previous_league_id;
     } catch (error) {
       // adaptor will throw error if there is a bad request
-      throw error;
+      throw new Error(error.message);
     }
   }
 
@@ -211,6 +209,6 @@ module.exports = {
   validateLeague,
   validateTeam,
   getOwnerInfo,
-  getLeagueInfo,
-  allLeagues,
+  getLeagueInfo, // done
+  allLeagues, // done
 };

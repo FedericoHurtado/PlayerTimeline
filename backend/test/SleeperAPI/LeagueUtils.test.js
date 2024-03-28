@@ -4,6 +4,7 @@ const {
   validateLeague,
   getOwnerInfo,
   getLeagueInfo,
+  allLeagues,
 } = require("../../SleeperAPI/LeagueUtils");
 
 // mock imports used in LeagueUtils
@@ -19,6 +20,11 @@ jest.mock("../../API_Adaptors/SleeperAPI/LeagueAdaptor", () => ({
 jest.mock("axios");
 
 describe("LeagueUtils.js unit tests", () => {
+  beforeEach(() => {
+    // Clears the call history of getSleeperLeague before each test
+    getSleeperLeague.mockClear();
+  });
+
   /**
    * getLeagueInfo() tests
    */
@@ -61,19 +67,108 @@ describe("LeagueUtils.js unit tests", () => {
   });
 
   test("getLeagueInfo: adaptor throws an error", async () => {
-    const good_league = {
-      bracket_id: null,
-      season: "2024",
-      status: "pre-draft",
-      total_rosters: 10,
-    };
-
     getSleeperLeague.mockRejectedValue(
       new Error("Error fetching the league info")
     );
 
     await expect(getLeagueInfo(123)).rejects.toThrow(
       "Error fetching the league info"
+    );
+  });
+
+  test("allLeagues: league with previous league is given", async () => {
+    const good_league = {
+      bracket_id: null,
+      season: "2024",
+      status: "pre-draft",
+      total_rosters: 10,
+      previous_league_id: "234",
+    };
+
+    const prev_league = {
+      bracket_id: null,
+      season: "2023",
+      status: "pre-draft",
+      total_rosters: 10,
+      previous_league_id: null,
+    };
+
+    getSleeperLeague
+      .mockResolvedValueOnce(good_league) // first call will return good league
+      .mockResolvedValueOnce(prev_league); // second call will return prev league
+
+    // get results from calling allLeagues
+    const leagues = await allLeagues("123");
+
+    // ensure getSleeperLeague was called twice and that the correct league ids are returned in a list
+    expect(getSleeperLeague).toHaveBeenCalledTimes(2);
+    expect(leagues).toStrictEqual(["123", "234"]);
+  });
+
+  test("allLeagues: league with null previous league is given", async () => {
+    const good_league = {
+      bracket_id: null,
+      season: "2024",
+      status: "pre-draft",
+      total_rosters: 10,
+      previous_league_id: null,
+    };
+
+    getSleeperLeague.mockResolvedValueOnce(good_league); // first call will return good league
+
+    // get results from calling allLeagues
+    const leagues = await allLeagues("123");
+
+    // ensure getSleeperLeague was called twice and that the correct league ids are returned in a list
+    expect(getSleeperLeague).toHaveBeenCalledTimes(1);
+    expect(leagues).toStrictEqual(["123"]);
+  });
+
+  test("allLeagues: getSleeperLeague throws an error", async () => {
+    getSleeperLeague.mockRejectedValue(new Error("Error getting team")); //getSleeperLeague throws error
+
+    await expect(allLeagues(123)).rejects.toThrow("Error getting team");
+  });
+
+  test("allLeagues: one league with missing previous league is given", async () => {
+    const bad_league = {
+      bracket_id: null,
+      season: "2024",
+      status: "pre-draft",
+      total_rosters: 10,
+    };
+
+    getSleeperLeague.mockResolvedValueOnce(bad_league); // first call will return bad league
+
+    // expect allLeagues to throw an error
+    await expect(allLeagues(123)).rejects.toThrow(
+      "Unable to find any information about previous leagues."
+    );
+  });
+
+  test("allLeagues: one good league and one bad league is given", async () => {
+    const good_league = {
+      bracket_id: null,
+      season: "2024",
+      status: "pre-draft",
+      total_rosters: 10,
+      previous_league_id: "124",
+    };
+
+    const bad_league = {
+      bracket_id: null,
+      season: "2024",
+      status: "pre-draft",
+      total_rosters: 10,
+    };
+
+    getSleeperLeague
+      .mockResolvedValueOnce(good_league) // first call will return good league
+      .mockResolvedValueOnce(bad_league); // second call will return bad league
+
+    // expect allLeagues to throw an error
+    await expect(allLeagues(123)).rejects.toThrow(
+      "Unable to find any information about previous leagues."
     );
   });
 });
